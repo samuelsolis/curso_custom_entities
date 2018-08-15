@@ -1,0 +1,8 @@
+#This is temporal, we have to change it when se have list
+#and other links.
+course.add_form:
+  title: Add Course
+  description: 'Add courses.'
+  route_name: entity.course.add_form
+  parent: system.admin
+  weight: -20

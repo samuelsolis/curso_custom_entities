@@ -35,8 +35,22 @@ use Drupal\user\UserInterface;
  *   admin_permission = "administer courses",
  *   handlers = {
  *     "storage_schema" = "Drupal\course\CourseStorageSchema",
+ *     "route_provider" = {
+ *       "html" = "Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider",
+ *     },
+ *    "form" = {
+ *       "default" = "\Drupal\Core\Entity\ContentEntityForm",
+ *       "delete" = "\Drupal\Core\Entity\EntityDeleteForm"
+ *     },
  *   },
- *   links = {},
+ *   links = {
+ *     "canonical" = "/course/{course}",
+ *     "delete-form" = "/course/{course}/delete",
+ *     "edit-form" = "/course/{course}/edit",
+ *     "version-history" = "/course/{course}/revisions",
+ *     "revision" = "/course/{course}/revisions/{course_revision}/view",
+ *     "add-form" = "/course/add",
+ *   }
  * )
  */
 
@@ -111,7 +125,7 @@ class Course extends ContentEntityBase {
    */
   public function preSave(EntityStorageInterface $storage) {
     parent::preSave($storage);
-    // If no revision author has been set explicitly, make the node owner the
+    // If no revision author has been set explicitly, make the course owner the
     // revision author.
     if (!$this->getRevisionUser()) {
       $this->setRevisionUserId($this->getOwnerId());
@@ -125,7 +139,7 @@ class Course extends ContentEntityBase {
     parent::preSaveRevision($storage, $record);
 
     if (!$this->isNewRevision() && isset($this->original) && (!isset($record->revision_log) || $record->revision_log === '')) {
-      // If we are updating an existing node without adding a new revision, we
+      // If we are updating an existing course without adding a new revision, we
       // need to make sure $entity->revision_log is reset whenever it is empty.
       // Therefore, this code allows us to avoid clobbering an existing log
       // entry with an empty one.
@@ -171,7 +185,12 @@ class Course extends ContentEntityBase {
         'default_value' => '',
         'max_length' => 255,
         'text_processing' => 0,
-      ]);
+      ])
+      ->setDisplayOptions('form', [
+        'type' => 'string_textfield',
+        'weight' => -5,
+      ])
+      ->setDisplayConfigurable('form', TRUE);
 
     /*
      * Meta fields.
@@ -188,7 +207,17 @@ class Course extends ContentEntityBase {
       ->setLabel(t('Authored by'))
       ->setDescription(t('The username of the content author.'))
       ->setSetting('target_type', 'user')
-      ->setDefaultValueCallback('Drupal\course\Entity\Course::getCurrentUserId');
+      ->setDefaultValueCallback('Drupal\course\Entity\Course::getCurrentUserId')
+      ->setDisplayOptions('form', [
+        'type' => 'entity_reference_autocomplete',
+        'weight' => 5,
+        'settings' => [
+          'match_operator' => 'CONTAINS',
+          'size' => '60',
+          'placeholder' => '',
+        ],
+      ])
+      ->setDisplayConfigurable('form', TRUE);
 
     return $fields;
   }
