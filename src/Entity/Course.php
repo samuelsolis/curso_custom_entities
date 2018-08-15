@@ -21,7 +21,9 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *     "label" = "title",
  *   },
  *   admin_permission = "administer courses",
- *   handlers = {},
+ *   handlers = {
+ *     "storage_schema" = "Drupal\course\CourseStorageSchema",
+ *   },
  *   links = {},
  * )
  */
@@ -54,6 +56,21 @@ class Course extends ContentEntityBase {
    */
   public function setChangedTime($timestamp) {
     $this->set('changed', $timestamp);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getTitle() {
+    return $this->get('title')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setTitle($title) {
+    $this->set('title', $title);
     return $this;
   }
 
