@@ -29,6 +29,36 @@ class Course extends ContentEntityBase {
 
   /**
    * {@inheritdoc}
+   */
+  public function getCreatedTime() {
+    return $this->get('created')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setCreatedTime($timestamp) {
+    $this->set('created', $timestamp);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getChangedTime() {
+    return $this->get('changed')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setChangedTime($timestamp) {
+    $this->set('changed', $timestamp);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
    *
    * Define the field properties here.
    *
@@ -57,6 +87,36 @@ class Course extends ContentEntityBase {
         'text_processing' => 0,
       ]);
 
+    /*
+     * Meta fields.
+     */
+    $fields['created'] = BaseFieldDefinition::create('created')
+      ->setLabel(t('Authored on'))
+      ->setDescription(t('The time that the course was created.'));
+
+    $fields['changed'] = BaseFieldDefinition::create('changed')
+      ->setLabel(t('Changed'))
+      ->setDescription(t('The time that the course last edited.'));
+
+    $fields['uid'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t('Authored by'))
+      ->setDescription(t('The username of the content author.'))
+      ->setSetting('target_type', 'user')
+      ->setDefaultValueCallback('Drupal\course\Entity\Course::getCurrentUserId');
+
     return $fields;
+  }
+
+
+  /**
+   * Default value callback for 'uid' base field definition.
+   *
+   * @see ::baseFieldDefinitions()
+   *
+   * @return array
+   *   An array of default values.
+   */
+  public static function getCurrentUserId() {
+    return [\Drupal::currentUser()->id()];
   }
 }
