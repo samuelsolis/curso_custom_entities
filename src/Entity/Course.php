@@ -3,8 +3,12 @@
 namespace Drupal\course\Entity;
 
 use Drupal\Core\Entity\ContentEntityBase;
+use Drupal\Core\Entity\EntityChangedTrait;
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Entity\RevisionLogEntityTrait;
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\user\UserInterface;
 
 
 /**
@@ -16,9 +20,17 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *   id = "course",
  *   label = @Translation("Course entity"),
  *   base_table = "courses",
+ *   revision_table = "course_revision",
+ *   show_revision_ui = TRUE,
  *   entity_keys = {
  *     "id" = "id",
+ *     "revision" = "rid",
  *     "label" = "title",
+ *   },
+ *   revision_metadata_keys = {
+ *     "revision_user" = "revision_uid",
+ *     "revision_created" = "revision_timestamp",
+ *     "revision_log_message" = "revision_log"
  *   },
  *   admin_permission = "administer courses",
  *   handlers = {
@@ -27,7 +39,11 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *   links = {},
  * )
  */
+
 class Course extends ContentEntityBase {
+
+  use RevisionLogEntityTrait;
+  use EntityChangedTrait;
 
   /**
    * {@inheritdoc}
@@ -44,20 +60,6 @@ class Course extends ContentEntityBase {
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getChangedTime() {
-    return $this->get('changed')->value;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setChangedTime($timestamp) {
-    $this->set('changed', $timestamp);
-    return $this;
-  }
 
   /**
    * {@inheritdoc}
@@ -72,6 +74,63 @@ class Course extends ContentEntityBase {
   public function setTitle($title) {
     $this->set('title', $title);
     return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getOwner() {
+    return $this->get('uid')->entity;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getOwnerId() {
+    return $this->getEntityKey('uid');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setOwnerId($uid) {
+    $this->set('uid', $uid);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setOwner(UserInterface $account) {
+    $this->set('uid', $account->id());
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function preSave(EntityStorageInterface $storage) {
+    parent::preSave($storage);
+    // If no revision author has been set explicitly, make the node owner the
+    // revision author.
+    if (!$this->getRevisionUser()) {
+      $this->setRevisionUserId($this->getOwnerId());
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function preSaveRevision(EntityStorageInterface $storage, \stdClass $record) {
+    parent::preSaveRevision($storage, $record);
+
+    if (!$this->isNewRevision() && isset($this->original) && (!isset($record->revision_log) || $record->revision_log === '')) {
+      // If we are updating an existing node without adding a new revision, we
+      // need to make sure $entity->revision_log is reset whenever it is empty.
+      // Therefore, this code allows us to avoid clobbering an existing log
+      // entry with an empty one.
+      $record->revision_log = $this->original->revision_log->value;
+    }
   }
 
   /**
@@ -94,6 +153,16 @@ class Course extends ContentEntityBase {
       ])
       ->setSetting('unsigned', TRUE)
       ->setReadOnly(TRUE);
+
+    $fields['rid'] = BaseFieldDefinition::create('integer')
+      ->setLabel(t('Course revision id'))
+      ->setDescription(t('Course revision id to identify revision course.'))
+      ->setSettings([
+        'default_value' => NULL,
+      ])
+      ->setSetting('unsigned', TRUE)
+      ->setReadOnly(TRUE);
+
 
     $fields['title'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Title'))
