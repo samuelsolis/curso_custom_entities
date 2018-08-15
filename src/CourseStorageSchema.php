@@ -29,7 +29,7 @@ class CourseStorageSchema extends SqlContentEntityStorageSchema {
       'course__title' => ['title'],
 
     ];
-    
+
     return $schema;
   }
 }

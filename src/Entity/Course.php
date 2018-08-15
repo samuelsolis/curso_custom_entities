@@ -76,7 +76,7 @@ class Course extends ContentEntityBase {
 
   /**
    * {@inheritdoc}
-   *
+   *entidad
    * Define the field properties here.
    *
    * Field name, type and size determine the table structure.
