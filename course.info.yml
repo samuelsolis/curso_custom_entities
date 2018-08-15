@@ -1,0 +1,5 @@
+name: Course
+description: Provide a course entity
+type: module
+core: 8.x
+package: OpenWebinars
