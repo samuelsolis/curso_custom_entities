@@ -16,11 +16,20 @@ class CourseStorageSchema extends SqlContentEntityStorageSchema {
   protected function getEntitySchema(ContentEntityTypeInterface $entity_type, $reset = FALSE) {
     $schema = parent::getEntitySchema($entity_type, $reset);
 
+    /*
+     * Element availables in $schema['courses'] :
+     *  - indexes
+     *  - primary key
+     *  - fields
+     *  - unique keys
+     *  - foreign keys
+     */
+
     $schema['courses']['indexes'] += [
       'course__title' => ['title'],
 
     ];
-
+    
     return $schema;
   }
 }
