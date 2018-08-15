@@ -190,7 +190,8 @@ class Course extends ContentEntityBase {
         'type' => 'string_textfield',
         'weight' => -5,
       ])
-      ->setDisplayConfigurable('form', TRUE);
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE);
 
     /*
      * Meta fields.
@@ -217,7 +218,13 @@ class Course extends ContentEntityBase {
           'placeholder' => '',
         ],
       ])
-      ->setDisplayConfigurable('form', TRUE);
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayOptions('view', [
+        'label' => 'above',
+        'type' => 'string',
+        'weight' => 5,
+      ])
+      ->setDisplayConfigurable('view', TRUE);
 
     return $fields;
   }
