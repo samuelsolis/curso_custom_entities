@@ -21,6 +21,7 @@ use Drupal\user\UserInterface;
  *   label = @Translation("Course entity"),
  *   base_table = "courses",
  *   revision_table = "course_revision",
+ *   admin_permission = "administer courses",
  *   show_revision_ui = TRUE,
  *   entity_keys = {
  *     "id" = "id",
@@ -34,18 +35,22 @@ use Drupal\user\UserInterface;
  *   },
  *   admin_permission = "administer courses",
  *   handlers = {
+ *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
+ *     "list_builder" = "Drupal\course\CourseListBuilder",
  *     "storage_schema" = "Drupal\course\CourseStorageSchema",
- *     "route_provider" = {
- *       "html" = "Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider",
- *     },
+ *     "access" = "Drupal\Core\Entity\EntityAccessControlHandler",
  *    "form" = {
  *       "default" = "\Drupal\Core\Entity\ContentEntityForm",
  *       "delete" = "\Drupal\Core\Entity\EntityDeleteForm"
+ *     },
+ *    "route_provider" = {
+ *       "html" = "Drupal\Core\Entity\Routing\AdminHtmlRouteProvider",
  *     },
  *   },
  *   links = {
  *     "canonical" = "/course/{course}",
  *     "delete-form" = "/course/{course}/delete",
+ *     "collection" = "/admin/content/courses",
  *     "edit-form" = "/course/{course}/edit",
  *     "version-history" = "/course/{course}/revisions",
  *     "revision" = "/course/{course}/revisions/{course_revision}/view",

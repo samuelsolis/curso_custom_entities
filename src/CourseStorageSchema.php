@@ -6,7 +6,7 @@ use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Entity\Sql\SqlContentEntityStorageSchema;
 
 /**
- * Defines the provider schema handler.
+ * Defines the course schema handler.
  */
 class CourseStorageSchema extends SqlContentEntityStorageSchema {
 
