@@ -20,6 +20,7 @@ use Drupal\user\UserInterface;
  *   id = "course",
  *   label = @Translation("Course entity"),
  *   base_table = "courses",
+ *   translatable = TRUE,
  *   revision_table = "course_revision",
  *   admin_permission = "administer courses",
  *   show_revision_ui = TRUE,
@@ -27,6 +28,7 @@ use Drupal\user\UserInterface;
  *     "id" = "id",
  *     "revision" = "rid",
  *     "label" = "title",
+ *     "langcode" = "langcode",
  *   },
  *   revision_metadata_keys = {
  *     "revision_user" = "revision_uid",
@@ -37,9 +39,10 @@ use Drupal\user\UserInterface;
  *   handlers = {
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
  *     "list_builder" = "Drupal\course\CourseListBuilder",
+ *     "translation" = "Drupal\course\CourseTranslationHandler",
  *     "storage_schema" = "Drupal\course\CourseStorageSchema",
  *     "access" = "Drupal\Core\Entity\EntityAccessControlHandler",
- *    "form" = {
+ *     "form" = {
  *       "default" = "\Drupal\Core\Entity\ContentEntityForm",
  *       "delete" = "\Drupal\Core\Entity\EntityDeleteForm"
  *     },
@@ -130,6 +133,16 @@ class Course extends ContentEntityBase {
    */
   public function preSave(EntityStorageInterface $storage) {
     parent::preSave($storage);
+
+    foreach (array_keys($this->getTranslationLanguages()) as $langcode) {
+      $translation = $this->getTranslation($langcode);
+
+      // If no owner has been set explicitly, make the anonymous user the owner.
+      if (!$translation->getOwner()) {
+        $translation->setOwnerId(0);
+      }
+    }
+
     // If no revision author has been set explicitly, make the course owner the
     // revision author.
     if (!$this->getRevisionUser()) {
@@ -164,6 +177,11 @@ class Course extends ContentEntityBase {
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
 
+    /*
+     * Get revision fields.
+     */
+    $fields = static::revisionLogBaseFieldDefinitions($entity_type);
+
     $fields['id'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('Course id'))
       ->setDescription(t('Course id to identify the course.'))
@@ -172,6 +190,11 @@ class Course extends ContentEntityBase {
       ])
       ->setSetting('unsigned', TRUE)
       ->setReadOnly(TRUE);
+
+    $fields['langcode'] = BaseFieldDefinition::create('language')
+      ->setLabel(t('Language code'))
+      ->setDescription(t('The course entity language code.'))
+      ->setRevisionable(TRUE);
 
     $fields['rid'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('Course revision id'))
@@ -186,6 +209,9 @@ class Course extends ContentEntityBase {
     $fields['title'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Title'))
       ->setDescription(t('Course title.'))
+      ->setRequired(TRUE)
+      ->setTranslatable(TRUE)
+      ->setRevisionable(TRUE)
       ->setSettings([
         'default_value' => '',
         'max_length' => 255,

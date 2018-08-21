@@ -15,7 +15,6 @@ class CourseStorageSchema extends SqlContentEntityStorageSchema {
    */
   protected function getEntitySchema(ContentEntityTypeInterface $entity_type, $reset = FALSE) {
     $schema = parent::getEntitySchema($entity_type, $reset);
-
     /*
      * Element availables in $schema['courses'] :
      *  - indexes
@@ -25,9 +24,8 @@ class CourseStorageSchema extends SqlContentEntityStorageSchema {
      *  - foreign keys
      */
 
-    $schema['courses']['indexes'] += [
+    $schema['course_field_data']['indexes'] += [
       'course__title' => ['title'],
-
     ];
 
     return $schema;
