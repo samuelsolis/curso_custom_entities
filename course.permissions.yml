@@ -1,2 +1,6 @@
 administer courses:
   title: 'View and edit all courses'
+administer course types:
+  title: 'View and edit all courses types'
+delete courses:
+  title: 'Delete courses'

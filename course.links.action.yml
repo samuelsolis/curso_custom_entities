@@ -1,5 +1,11 @@
 course_entity_action_add:
-  route_name: entity.course.add_form
+  route_name: entity.course.add_page
   title: 'Add Course entity'
   appears_on:
     - entity.course.collection
+
+course_type_entity_action_add:
+  route_name: entity.course_type.add_form
+  title: 'Add Courseentity type (bundle)'
+  appears_on:
+    - entity.course_type.collection

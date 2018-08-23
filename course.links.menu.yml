@@ -3,3 +3,9 @@ course_entity_collection_menu:
   route_name: entity.course.collection
   description: 'List of Course entities'
   parent: system.admin
+
+course_type_entity_collection_menu:
+  title: 'Course Types'
+  route_name: entity.course_type.collection
+  description: 'List of Course entity types (bundles)'
+  parent: system.admin_structure

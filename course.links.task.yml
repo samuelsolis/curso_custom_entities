@@ -1,0 +1,14 @@
+# Course entity tabs.
+course_entity_task_view:
+  route_name: entity.course.canonical
+  base_route: entity.course.canonical
+  title: 'View'
+course_entity_task_edit:
+  route_name: entity.course.edit_form
+  base_route: entity.course.canonical
+  title: 'Edit'
+course_entity_task_delete:
+  route_name:  entity.course.delete_form
+  base_route:  entity.course.canonical
+  title: Delete
+  weight: 10

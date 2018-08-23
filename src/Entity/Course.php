@@ -21,11 +21,13 @@ use Drupal\user\UserInterface;
  *   label = @Translation("Course entity"),
  *   base_table = "courses",
  *   translatable = TRUE,
+ *   fieldable = TRUE,
  *   revision_table = "course_revision",
  *   admin_permission = "administer courses",
  *   show_revision_ui = TRUE,
  *   entity_keys = {
  *     "id" = "id",
+ *     "bundle" = "bundle",
  *     "revision" = "rid",
  *     "label" = "title",
  *     "langcode" = "langcode",
@@ -55,10 +57,13 @@ use Drupal\user\UserInterface;
  *     "delete-form" = "/course/{course}/delete",
  *     "collection" = "/admin/content/courses",
  *     "edit-form" = "/course/{course}/edit",
+ *     "add-form" = "/course/add/{course_type}",
+ *     "add-page" = "/course/add",
  *     "version-history" = "/course/{course}/revisions",
  *     "revision" = "/course/{course}/revisions/{course_revision}/view",
- *     "add-form" = "/course/add",
- *   }
+ *   },
+ *   bundle_entity_type = "course_type",
+ *   field_ui_base_route = "entity.course_type.edit_form",
  * )
  */
 
@@ -178,9 +183,14 @@ class Course extends ContentEntityBase {
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
 
     /*
+     * Provide base properties as bundle.
+     */
+    $fields = parent::baseFieldDefinitions($entity_type);
+
+    /*
      * Get revision fields.
      */
-    $fields = static::revisionLogBaseFieldDefinitions($entity_type);
+    $fields += static::revisionLogBaseFieldDefinitions($entity_type);
 
     $fields['id'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('Course id'))
