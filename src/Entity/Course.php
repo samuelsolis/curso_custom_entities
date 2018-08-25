@@ -40,6 +40,7 @@ use Drupal\user\UserInterface;
  *   admin_permission = "administer courses",
  *   handlers = {
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
+ *     "views_data" = "Drupal\views\EntityViewsData",
  *     "list_builder" = "Drupal\course\CourseListBuilder",
  *     "translation" = "Drupal\course\CourseTranslationHandler",
  *     "storage_schema" = "Drupal\course\CourseStorageSchema",
